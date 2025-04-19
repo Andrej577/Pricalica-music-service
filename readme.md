@@ -2,24 +2,24 @@
 
 ## Server + Klijent
 
-- Server je razvijen u Python 3 koristeći Flask i omogućava HTTP streaming MP3 datoteka.
+- Server je razvijen u Python 3 koristeći Flask i omogućuje HTTP streaming MP3 datoteka.
 - Klijentska aplikacija je izrađena pomoću Tkinter (GUI) i Pygame (audio).
 
 # Detalji
 
 - Server se može pokrenuti samostalno ili putem Docker kontejnera.
-- Klijentska aplikacija (`client.py`) ne pokreće se iz Dockera, već direktno na host mašini.
+- Klijentska aplikacija (`client.py`) ne pokreće se iz Dockera, već direktno na host uređaju.
 - Server otvara port 5000 za pristup MP3 streamingu.
 
 # Docker
 
 - Docker kontejner pokreće samo server.
-- MP3 datoteke se spremaju u lokalni folder `/music`.
+- MP3 datoteke se spremaju u lokalnu mapu `/music`.
 - Klijent (`client.py`) može se pokrenuti lokalno ili koristiti web preglednik za pristup serveru.
 
 ## Docker - Pokretanje projekta
 
-Za pokretanje servera putem Dockera iz glavnog direktorijuma projekta:
+Za pokretanje servera putem Dockera iz glavne mape projekta:
 
 ```
 docker compose up
@@ -33,7 +33,7 @@ docker compose up
 
 # Instalacija Portainera (Ubuntu)
 
-Pokreni sljedeću komandu za instalaciju Portainera:
+Pokreni sljedeću naredbu za instalaciju Portainera:
 
 ```
 sudo docker run -d \
