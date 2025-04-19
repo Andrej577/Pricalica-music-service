@@ -1,12 +1,14 @@
-from flask import Flask, request, Response, abort, send_file
+from flask import Flask, request, Response, abort, send_file, send_from_directory, jsonify
 import os
 import mimetypes
 import re
+from gtts import gTTS
 
 app = Flask(__name__)
 
-# Gde su ti mp3 fajlovi
-MUSIC_FOLDER = "./music"
+app = Flask(__name__)
+MUSIC_FOLDER = "music"
+os.makedirs(MUSIC_FOLDER, exist_ok=True)
 
 @app.route('/stream')
 def stream_audio():
@@ -65,6 +67,29 @@ def stream_audio():
     response.headers.add('Content-Length', str(length))
 
     return response
+
+@app.route("/generate", methods=["POST"])
+def generate():
+    data = request.json
+    text = data.get("text")
+    lang = data.get("lang", "hr")
+    filename = data.get("filename", "output")
+
+    if not text:
+        return jsonify({"error": "Text je obavezan."}), 400
+
+    if not filename.endswith('.mp3'):
+        filename += '.mp3'
+
+    filepath = os.path.join(MUSIC_FOLDER, filename)
+
+    try:
+        tts = gTTS(text=text, lang=lang)
+        tts.save(filepath)
+        return jsonify({"message": "Uspješno kreirano.", "filename": filename}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

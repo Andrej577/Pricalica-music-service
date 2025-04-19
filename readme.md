@@ -1,29 +1,43 @@
 # Opis
 
-## Server + Klijent
+## Server
 
 - Server je razvijen u Python 3 koristeći Flask i omogućuje HTTP streaming MP3 datoteka.
-- Klijentska aplikacija je izrađena pomoću Tkinter (GUI) i Pygame (audio).
+- Sever također ima "text to speech" funkcionalnost
+
+## Klijenti
+- U projektu su 2 klijentske aplikaicje:
+  - `audio-client.py` - preslušavanje audio snimki HTTP vezom
+  - `tts-client.py` - text to speech klijent u kojem se unosi tekst koji kasnije sprema mp3 datoteku u `/music` mapu
 
 # Detalji
 
 - Server se može pokrenuti samostalno ili putem Docker kontejnera.
-- Klijentska aplikacija (`client.py`) ne pokreće se iz Dockera, već direktno na host uređaju.
-- Server otvara port 5000 za pristup MP3 streamingu.
+- Klijentske aplikacije se ne pokreću se iz Dockera, već direktno na host uređaju.
+- Server otvara port 5000 za pristup MP3 streamingu i konverziji teksta u audio.
 
 # Primjer korištenja
 
-- Kada je server pokrenut u web pregledniku se može napraviti upit na slijedeći način:
+- Preslušavanje audio datoteke:
 
 ```
-http://localhost:5000/stream?file=gorila.mp3
+http://localhost:5000/stream?file=audio.mp3
 ```
+
+- Konverzija teksta u audio datoteku:
+
+| Element         | Vrijednost |
+|:----------------|:-----------|
+| URL             | `http://localhost:5000/generate` |
+| Metoda          | `POST` |
+| Content-Type    | `application/json` |
+| Tijelo zahtjeva | `{ "text": "neki tekst", "lang": "hr", "filename": "ime_fajla" }` |
 
 # Docker
 
 - Docker kontejner pokreće samo server.
-- MP3 datoteke se spremaju u lokalnu mapu `/music`.
-- Klijent (`client.py`) može se pokrenuti lokalno ili koristiti web preglednik za pristup serveru.
+- MP3 datoteke se spremaju i čitaju iz lokalne mape `/music`.
+- Klijenti se mogu pokrenuti lokalno ili koristiti web preglednik za pristup serveru.
 
 ## Docker - Pokretanje projekta
 
@@ -75,7 +89,8 @@ http://localhost:9000
 
 | Komponenta | Tehnologija |
 |:--|:--|
-| Server | Python 3 + Flask |
+| Server | Python3 + Flask |
+| TTS | Python3 + gTTS |
 | Klijent | Tkinter + Pygame |
 | Docker | Docker Compose za server |
 | GUI upravljanje | Portainer |
