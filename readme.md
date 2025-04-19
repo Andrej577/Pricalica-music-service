@@ -31,7 +31,7 @@ http://localhost:5000/stream?file=audio.mp3
 | URL             | `http://localhost:5000/generate` |
 | Metoda          | `POST` |
 | Content-Type    | `application/json` |
-| Tijelo zahtjeva | `{ "text": "neki tekst", "lang": "hr", "filename": "ime_fajla" }` |
+| Tijelo zahtjeva | `{ "text": "nekakav tekst", "lang": "hr", "filename": "ime_datoteke" }` |
 
 # Docker
 
