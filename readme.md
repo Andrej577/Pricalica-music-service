@@ -11,6 +11,14 @@
 - Klijentska aplikacija (`client.py`) ne pokreće se iz Dockera, već direktno na host uređaju.
 - Server otvara port 5000 za pristup MP3 streamingu.
 
+# Primjer korištenja
+
+- Kada je server pokrenut u web pregledniku se može napraviti upit na slijedeći način:
+
+```
+http://localhost:5000/stream?file=gorila.mp3
+```
+
 # Docker
 
 - Docker kontejner pokreće samo server.
