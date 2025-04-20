@@ -3,12 +3,19 @@ import os
 import mimetypes
 import re
 from gtts import gTTS
+import fitz
 
 app = Flask(__name__)
 
-app = Flask(__name__)
-MUSIC_FOLDER = "music"
-os.makedirs(MUSIC_FOLDER, exist_ok=True)
+
+# Define folders
+PDF_FOLDER = "pdf"
+TEXT_FOLDER = "text"
+AUDIO_FOLDER = "audio"
+
+# Make sure folders exist
+for folder in [PDF_FOLDER, TEXT_FOLDER, AUDIO_FOLDER]:
+    os.makedirs(folder, exist_ok=True)
 
 @app.route('/stream')
 def stream_audio():
@@ -16,7 +23,7 @@ def stream_audio():
     if not file_name:
         return abort(400, description="Missing 'file' query parameter.")
 
-    file_path = os.path.join(MUSIC_FOLDER, file_name)
+    file_path = os.path.join(AUDIO_FOLDER, file_name)
 
     if not os.path.isfile(file_path):
         return abort(404, description="File not found.")
@@ -68,28 +75,86 @@ def stream_audio():
 
     return response
 
-@app.route("/generate", methods=["POST"])
-def generate():
+@app.route("/upload_pdf", methods=["POST"])
+def upload_pdf():
+    if 'pdf' not in request.files:
+        return jsonify({"error": "PDF file je obavezan."}), 400
+
+    pdf_file = request.files['pdf']
+    pdf_filename = pdf_file.filename
+    pdf_path = os.path.join(PDF_FOLDER, pdf_filename)
+    
+    # Prvo spremi PDF (mora postojati na disku da fitz može otvoriti)
+    pdf_file.save(pdf_path)
+
+    try:
+        # Extract text
+        doc = fitz.open(pdf_path)
+        extracted_text = ""
+        for page in doc:
+            extracted_text += page.get_text()
+            extracted_text += "\n" + "-"*80 + "\n"
+
+        # Generate TTS audio
+        audio_filename = pdf_filename.rsplit('.', 1)[0] + ".mp3"
+        success, message = generate_tts(extracted_text, audio_filename)
+
+        if success:
+            # Save text
+            txt_filename = pdf_filename.rsplit('.', 1)[0] + ".txt"
+            txt_path = os.path.join(TEXT_FOLDER, txt_filename)
+            with open(txt_path, "w", encoding="utf-8") as f:
+                f.write(extracted_text)
+
+            return jsonify({
+                "message": "PDF konvertiran i audio generiran.",
+                "pdf": pdf_filename,
+                "text": txt_filename,
+                "audio": audio_filename
+            }), 200
+        else:
+            # Ako TTS ne uspije, briši PDF
+            os.remove(pdf_path)
+            os.remove(txt_filename)
+            return jsonify({"error": message}), 500
+
+    except Exception as e:
+        # Ako bilo šta pukne, briši PDF
+        if os.path.exists(pdf_path):
+            os.remove(pdf_path)
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/upload_text", methods=["POST"])
+def upload_text():
     data = request.json
-    text = data.get("text")
-    lang = data.get("lang", "hr")
-    filename = data.get("filename", "output")
+    if not data or "text" not in data:
+        return jsonify({"error": "Polje 'text' je obavezno."}), 400
 
-    if not text:
-        return jsonify({"error": "Text je obavezan."}), 400
+    text = data["text"]
+    base_filename = data.get("filename", "output")
 
-    if not filename.endswith('.mp3'):
-        filename += '.mp3'
+    # Generate TTS audio
+    audio_filename = base_filename + ".mp3"
+    success, message = generate_tts(text, audio_filename)
 
-    filepath = os.path.join(MUSIC_FOLDER, filename)
+    if success:
+        # Save text
+        txt_filename = base_filename + ".txt"
+        txt_path = os.path.join(TEXT_FOLDER, txt_filename)
+        with open(txt_path, "w", encoding="utf-8") as f:
+            f.write(text)
+        return jsonify({"message": "Tekst konvertiran i audio generiran.", "text": txt_filename, "audio": audio_filename}), 200
+    else:
+        return jsonify({"error": message}), 500
 
+def generate_tts(text, filename, lang="hr"):
+    filepath = os.path.join(AUDIO_FOLDER, filename)
     try:
         tts = gTTS(text=text, lang=lang)
         tts.save(filepath)
-        return jsonify({"message": "Uspješno kreirano.", "filename": filename}), 200
+        return True, "OK"
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
+        return False, str(e)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)

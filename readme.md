@@ -3,24 +3,25 @@
 ## Server
 
 - Server je razvijen u Python 3 koristeći Flask i omogućuje HTTP streaming MP3 datoteka.
-- Sever također ima "text to speech" funkcionalnost
+- Sever također ima "text to speech" funkcionalnost, te funkcionalnost uplaoda pdf datoteke koja će automatski biti konvertirana u text a potom u audio snimku.
 
 ## Klijenti
-- U projektu su 2 klijentske aplikaicje:
-  - `audio-client.py` - preslušavanje audio snimki HTTP vezom
-  - `tts-client.py` - text to speech klijent u kojem se unosi tekst koji kasnije sprema mp3 datoteku u `/music` mapu
+- U mapi `clients` su 3 klijentske aplikaicje:
+  - `audio-client.py` - preslušavanje audio snimki HTTP vezom.
+  - `tts-client.py` - text to speech klijent u kojem se unosi tekst koji kasnije sprema mp3 datoteku u `/audio` mapu.
+  - `pdf-client.py` - cli aplikacija koja zahtjeva putanju pdf datoteke koja će biti uploadana na server te odraditi koverziju u text i audio.
 
 # Detalji
 
-- Server se može pokrenuti samostalno ili putem Docker kontejnera.
-- Klijentske aplikacije se ne pokreću se iz Dockera, već direktno na host uređaju.
-- Server otvara port 5000 za pristup MP3 streamingu i konverziji teksta u audio.
+- Server se može pokrenuti samostalno korištenjem `server.py` ili putem Docker kontejnera.
+- Klijentske aplikacije se ne pokreću se iz Dockera, već direktno na uređaju.
+- Server otvara port 5000 za pristup MP3 streamingu i konverziji teksta u audio te uploadu i konverziji pdf-a.
 
 # Primjer korištenja
 
 - Preslušavanje audio datoteke:
 
-```
+``` 
 http://localhost:5000/stream?file=audio.mp3
 ```
 
@@ -33,11 +34,16 @@ http://localhost:5000/stream?file=audio.mp3
 | Content-Type    | `application/json` |
 | Tijelo zahtjeva | `{ "text": "nekakav tekst", "lang": "en", "filename": "ime_datoteke" }` |
 
+- Primjer uplaoda pdf datoteke: 
+
+```bash
+curl -X POST -F "pdf=@/home/user/Documents/test.pdf" http://localhost:5000/upload_pdf
+```
 # Docker
 
 - Docker kontejner pokreće samo server.
-- MP3 datoteke se spremaju i čitaju iz lokalne mape `/music`.
-- Klijenti se mogu pokrenuti lokalno ili koristiti web preglednik za pristup serveru.
+- MP3 datoteke se spremaju i čitaju iz lokalne serverske mape `/audio`.
+- Klijenti se mogu pokrenuti lokalno ili koristiti web preglednik i url endpoint za pristup serveru.
 
 ## Docker - Pokretanje projekta
 
@@ -91,6 +97,7 @@ http://localhost:9000
 |:--|:--|
 | Server | Python3 + Flask |
 | TTS | Python3 + gTTS |
-| Klijent | Tkinter + Pygame |
+| PdfToText | Python3 + PyMuPDF |
+| Klijent | Tkinter + Pygame + Requests |
 | Docker | Docker Compose za server |
-| GUI upravljanje | Portainer |
+| GUI upravljanje Dockerom | Portainer |
