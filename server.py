@@ -168,7 +168,7 @@ def download_pdf():
         mimetype='application/pdf'
     )
 
-def generate_tts(text, filename, lang="hr"):
+def generate_tts(text, filename, lang="en"):
     filepath = os.path.join(AUDIO_FOLDER, filename)
     try:
         tts = gTTS(text=text, lang=lang)
