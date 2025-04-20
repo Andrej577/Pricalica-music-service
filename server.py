@@ -147,6 +147,27 @@ def upload_text():
     else:
         return jsonify({"error": message}), 500
 
+@app.route('/download_pdf')
+def download_pdf():
+    file_name = request.args.get('file')
+    if not file_name:
+        return abort(400, description="Missing 'file' query parameter.")
+
+    if not file_name.lower().endswith(".pdf"):
+        return abort(400, description="Only PDF files are allowed.")
+
+    file_path = os.path.join(PDF_FOLDER, file_name)
+
+    if not os.path.isfile(file_path):
+        return abort(404, description="File not found.")
+
+    return send_from_directory(
+        PDF_FOLDER,
+        file_name,
+        as_attachment=True,
+        mimetype='application/pdf'
+    )
+
 def generate_tts(text, filename, lang="hr"):
     filepath = os.path.join(AUDIO_FOLDER, filename)
     try:
