@@ -9,13 +9,21 @@ app = Flask(__name__)
 
 
 # Define folders
-PDF_FOLDER = "pdf"
-TEXT_FOLDER = "text"
-AUDIO_FOLDER = "audio"
+PDF_FOLDER = Path("pdf")
+TEXT_FOLDER = Path("text")
+AUDIO_FOLDER = Path("audio")
 
 # Make sure folders exist
 for folder in [PDF_FOLDER, TEXT_FOLDER, AUDIO_FOLDER]:
-    os.makedirs(folder, exist_ok=True)
+    folder.mkdir(exist_ok=True)
+
+@app.route("/audio", methods=["GET"])
+def getAudios():
+    files = []
+    for file in AUDIO_FOLDER.iterdir():
+        if file.is_file():
+            files.append(file.name)
+    return jsonify(files)
 
 @app.route('/stream')
 def stream_audio():
