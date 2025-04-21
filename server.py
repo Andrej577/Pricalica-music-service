@@ -2,6 +2,7 @@ from flask import Flask, request, Response, abort, send_file, send_from_director
 import os
 import mimetypes
 import re
+from pathlib import Path
 from gtts import gTTS
 import fitz
 
@@ -17,7 +18,7 @@ AUDIO_FOLDER = Path("audio")
 for folder in [PDF_FOLDER, TEXT_FOLDER, AUDIO_FOLDER]:
     folder.mkdir(exist_ok=True)
 
-@app.route("/audio", methods=["GET"])
+@app.route("/audio")
 def getAudios():
     files = []
     for file in AUDIO_FOLDER.iterdir():
