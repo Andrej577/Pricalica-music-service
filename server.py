@@ -1,13 +1,14 @@
-from flask import Flask, request, Response, abort, send_file, send_from_directory, jsonify
+from flask import Flask, request, Response, abort, send_file, send_from_directory, jsonify, render_template
 import os
 import mimetypes
 import re
 from pathlib import Path
 from gtts import gTTS
 import fitz
+from pydub import AudioSegment
+
 
 app = Flask(__name__)
-
 
 # Define folders
 PDF_FOLDER = Path("pdf")
@@ -17,6 +18,14 @@ AUDIO_FOLDER = Path("audio")
 # Make sure folders exist
 for folder in [PDF_FOLDER, TEXT_FOLDER, AUDIO_FOLDER]:
     folder.mkdir(exist_ok=True)
+
+
+@app.route("/")
+def index():
+    audio_files = os.listdir(AUDIO_FOLDER)
+    pdf_files = os.listdir(PDF_FOLDER)
+    text_files = os.listdir(TEXT_FOLDER)
+    return render_template("index.html", audio_files=audio_files, pdf_files=pdf_files, text_files=text_files)
 
 @app.route("/audio")
 def getAudios():
@@ -178,10 +187,18 @@ def download_pdf():
     )
 
 def generate_tts(text, filename, lang="en"):
-    filepath = os.path.join(AUDIO_FOLDER, filename)
+    mp3_path = os.path.join(AUDIO_FOLDER, filename)
+    wav_path = os.path.join(AUDIO_FOLDER, filename.rsplit('.', 1)[0] + '.wav')
     try:
         tts = gTTS(text=text, lang=lang)
-        tts.save(filepath)
+        tts.save(mp3_path)
+
+        audio = AudioSegment.from_mp3(mp3_path)
+        audio.export(wav_path, format="wav")
+
+        # Ako želiš, možeš obrisati mp3 nakon konverzije
+        # os.remove(mp3_path)
+
         return True, "OK"
     except Exception as e:
         return False, str(e)

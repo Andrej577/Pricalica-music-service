@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     libpulse-dev \
     libsdl2-mixer-2.0-0 \
     libsdl2-2.0-0 \
+    ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 # Napravi folder
