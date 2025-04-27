@@ -4,6 +4,8 @@
 
 - Server je razvijen u Python 3 koristeći Flask i omogućuje HTTP streaming MP3 datoteka.
 - Sever također ima "text to speech" funkcionalnost, te funkcionalnost uplaoda pdf datoteke koja će automatski biti konvertirana u text a potom u audio snimku.
+- Konverzija mp3 datoteke u waw an serverskoj strani
+- Za konverziju MP3 ➔ WAV koristi se `ffmpeg`, koji mora biti instaliran na serveru.
 
 ## Klijenti
 - U mapi `clients` su 3 klijentske aplikaicje:
@@ -90,6 +92,18 @@ http://localhost:9000
 - Primjer korisničkog imena i lozinke:
   - Username: `admin`
   - Password: `adminadmin12`
+
+# ffmpeg zahtjev
+
+Za konverziju MP3 u WAV format, server koristi biblioteku `pydub` koja zahtijeva instaliran `ffmpeg`.
+
+**Instalacija ffmpeg:**
+
+Ubuntu/Debian:
+```
+sudo apt update
+sudo apt install ffmpeg
+```
 
 # Kratki sažetak
 
