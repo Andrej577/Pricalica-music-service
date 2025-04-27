@@ -7,11 +7,12 @@
 - Konverzija mp3 datoteke u waw an serverskoj strani
 - Za konverziju MP3 ➔ WAV koristi se `ffmpeg`, koji mora biti instaliran na serveru.
 
-## Klijenti
-- U mapi `clients` su 3 klijentske aplikaicje:
-  - `audio-client.py` - preslušavanje audio snimki HTTP vezom.
-  - `tts-client.py` - text to speech klijent u kojem se unosi tekst koji kasnije sprema mp3 datoteku u `/audio` mapu.
-  - `pdf-client.py` - cli aplikacija koja zahtjeva putanju pdf datoteke koja će biti uploadana na server te odraditi koverziju u text i audio.
+## Web Sučelje
+- Web sučelje (Bootstrap 5) omogućuje:
+  - Pregled dostupnih audio (MP3/WAV), PDF i tekstualnih datoteka.
+  - Upload PDF dokumenata koji se automatski pretvaraju u tekst i audio
+  - Upload teksta direktno putem forme, s automatskom generacijom audio zapisa.
+  - Streamanje i preslušavanje audio snimki direktno preko preglednika.
 
 # Detalji
 
@@ -95,7 +96,7 @@ http://localhost:9000
 
 # ffmpeg zahtjev
 
-Za konverziju MP3 u WAV format, server koristi biblioteku `pydub` koja zahtijeva instaliran `ffmpeg`.
+Za konverziju MP3 u WAV format, server koristi biblioteku `pydub` koja zahtijeva instaliran `ffmpeg`(ovo vrijedi za sustav koji ne radi u Docker-u).
 
 **Instalacija ffmpeg:**
 
@@ -112,6 +113,7 @@ sudo apt install ffmpeg
 | Server | Python3 + Flask |
 | TTS | Python3 + gTTS |
 | PdfToText | Python3 + PyMuPDF |
-| Klijent | Tkinter + Pygame + Requests |
+| Audio konverzija	| Python3 + pydub + ffmpeg |
+| Frontend | Bootstrap 5 (HTML5) |
 | Docker | Docker Compose za server |
 | GUI upravljanje Dockerom | Portainer |
